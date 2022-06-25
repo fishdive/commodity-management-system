@@ -1,0 +1,25 @@
+.el-form--inline .el-form-item {
+    margin-right: 0px;
+}
+
+.el-button + .el-button {
+    margin-left: 0px;
+}
+
+.el-input__inner {
+    padding: 0px;
+}
+
+/*.el-header, .el-footer {*/
+/*    color: #333;*/
+/*    text-align: center;*/
+/*}*/
+
+/*.el-main {*/
+/*    color: #333;*/
+/*    text-align: center;*/
+/*}*/
+
+/*body > .el-container {*/
+/*    margin-bottom: 40px;*/
+/*}*/

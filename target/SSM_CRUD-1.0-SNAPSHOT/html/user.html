@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <link href="http://localhost:80/SSM_CRUD_war/lib/element-ui/index.css" rel="stylesheet"/>
+    <link href="http://localhost:80/SSM_CRUD_war/css/public.css" rel="stylesheet">
+    <link href="http://localhost:80/SSM_CRUD_war/css/user.css" rel="stylesheet">
+    <link href="http://localhost:80/SSM_CRUD_war/css/index.css" rel="stylesheet">
+    <link href="http://localhost:80/SSM_CRUD_war/lib/font/icon/iconfont.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="app">
+    <!-- header -->
+    <el-menu :default-active="activeIndex" mode="horizontal">
+        <el-menu-item id="logo" index="0">SSM入门</el-menu-item>
+        <el-menu-item index="1"><a href="/SSM_CRUD_war/toIndex.action">首页</a></el-menu-item>
+        <el-menu-item index="2"><a href="/SSM_CRUD_war/toUser.action">用户管理</a></el-menu-item>
+        <el-menu-item index="3"><a href="/SSM_CRUD_war/toGoods.action">商品列表</a></el-menu-item>
+        <el-menu-item id="author" index="4">
+            <img class="el-tooltip" src="http://localhost:80/SSM_CRUD_war/image/toxiang.jpg"/>
+            <el-dropdown>
+                <span class="el-dropdown-link" id="userName">fishdive<i
+                        class="el-icon-arrow-down el-icon--right"></i></span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item><a href="/SSM_CRUD_war/toIndex.action">首页</a></el-dropdown-item>
+                    <el-dropdown-item divided><a href="/SSM_CRUD_war/user/logout.action">退出</a></el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </el-menu-item>
+    </el-menu>
+
+    <!-- main -->
+    <div id="main">
+        <el-container>
+            <el-header>
+                <el-form :inline="true" :model="findValue" class="demo-form-inline">
+                    <el-form-item label="id">
+                        <el-input placeholder="id" v-model="findValue.id"></el-input>
+                    </el-form-item>
+                    <el-form-item label="name">
+                        <el-input placeholder="用户名" v-model="findValue.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="等级">
+                        <el-select placeholder="请选择" v-model="findValue.grade">
+                            <el-option :key="item.value" :label="item.label" :value="item.value"
+                                       v-for="item in gradeOptions">
+                            </el-option>
+                            <el-option label="请选择"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="状态">
+                        <el-select placeholder="请选择" v-model="findValue.state">
+                            <el-option :key="item.value" :label="item.label" :value="item.value"
+                                       v-for="item in stateOptions">
+                            </el-option>
+                            <el-option label="请选择"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button @click="findByTerm" type="primary">查询</el-button>
+                        <el-button @click="handleAdd" type="primary">新建</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-header>
+            <el-main>
+                <el-table :data="tableData" style="width: 100%">
+                    <el-table-column label="id" prop="id">
+                    </el-table-column>
+                    <el-table-column label="用户名" prop="name">
+                    </el-table-column>
+                    <el-table-column label="密码" prop="password">
+                    </el-table-column>
+                    <el-table-column label="等级" prop="grade">
+                    </el-table-column>
+                    <el-table-column label="状态" prop="state">
+                    </el-table-column>
+                    <el-table-column label="创建人" prop="creator">
+                    </el-table-column>
+                    <el-table-column label="修改人" prop="modifier">
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <el-button
+                                    @click="handleEdit(scope.$index, scope.row)"
+                                    size="mini">编辑
+                            </el-button>
+                            <el-button
+                                    @click="handleDelete(scope.$index, scope.row)"
+                                    size="mini"
+                                    type="danger">删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-main>
+            <el-footer>
+
+            </el-footer>
+        </el-container>
+
+        <!-- 分页 -->
+        <div class="pagination">
+            <el-pagination
+                    :current-page="pageConf.pageCode"
+                    :page-size="pageConf.pageSize"
+                    :page-sizes="pageConf.pageOption"
+                    :total="pageConf.totalPage"
+                    @current-change="handleCurrentChange"
+                    @size-change="handleSizeChange"
+                    background
+                    layout="total, sizes, prev, pager, next, jumper">
+            </el-pagination>
+        </div>
+
+        <!-- 编辑标签弹层 -->
+
+        <div class="add-form">
+            <el-dialog :visible.sync="dialogFormVisible4Edit" title="编辑检查项">
+                <el-form :model="formData" label-position="right" label-width="100px" ref="dataEditForm">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="用户名" prop="name">
+                                <el-input v-model="formData.name"/>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="密码" prop="password">
+                                <el-input show-password="ture" v-model="formData.password"/>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="等级" prop="grade">
+                                <el-select placeholder="请选择" v-model="formData.grade">
+                                    <el-option :key="item.value" :label="item.label" :value="item.value"
+                                               v-for="item in gradeOptions">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="状态" prop="state">
+                                <el-select placeholder="请选择" v-model="formData.state">
+                                    <el-option :key="item.value" :label="item.label" :value="item.value"
+                                               v-for="item in stateOptions">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+                <div class="dialog-footer" slot="footer">
+                    <el-button @click="cancel()">取消</el-button>
+                    <el-button @click="handleEnter()" type="primary">确定</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog :visible.sync="dialogFormVisible4Add" title="新建">
+                <el-form :model="addFormData" label-position="right" label-width="100px" ref="dataAddForm">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="用户名" prop="name">
+                                <el-input v-model="addFormData.name"/>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="密码" prop="password">
+                                <el-input show-password="ture" v-model="addFormData.password"/>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="等级" prop="grade">
+                                <el-select placeholder="请选择" v-model="addFormData.grade">
+                                    <el-option :key="item.value" :label="item.label" :value="item.value"
+                                               v-for="item in gradeOptions">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="状态" prop="state">
+                                <el-select placeholder="请选择" v-model="addFormData.state">
+                                    <el-option :key="item.value" :label="item.label" :value="item.value"
+                                               v-for="item in stateOptions">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+                <div class="dialog-footer" slot="footer">
+                    <el-button @click="cancelAdd()">取消</el-button>
+                    <el-button @click="handleEnterAdd()" type="primary">确定</el-button>
+                </div>
+            </el-dialog>
+        </div>
+
+        <!-- footer -->
+        <div class="footer">
+            <el-container>
+                <el-footer>
+                    <el-row :gutter="20">
+                        <el-col :offset="10" :span="8">
+                            <div class="footer-inner">
+                                <div class="copyright">&copy; 2022 &mdash; <span itemprop="copyrightYear">2025</span>
+                                    <span class="with-love">
+                                    <i class="fa fa-heartbeat"></i>
+                                </span>
+                                    <span class="author" itemprop="copyrightHolder">fishdive</span>
+                                </div>
+                                <label>优雅的入门Spring SpringMVC Mybatis，实现简单的CRUD。页面使用Vue和ElementUI制作</label>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </el-footer>
+            </el-container>
+        </div>
+    </div>
+</div>
+</body>
+<script src="http://localhost:80/SSM_CRUD_war/lib/vue/vue.js" type="text/javascript"></script>
+<script src="http://localhost:80/SSM_CRUD_war/lib/element-ui/index.js" type="text/javascript"></script>
+<script src="http://localhost:80/SSM_CRUD_war/lib/vue/vue-resource.js" type="text/javascript"></script>
+<script src="http://localhost:80/SSM_CRUD_war/lib/vue/vuex.min.js" type="text/javascript"></script>
+<script src="http://localhost:80/SSM_CRUD_war/lib/js/axios-0.18.0.js"></script>
+<script src="http://localhost:80/SSM_CRUD_war/js/user.js" type="text/javascript"></script>
+</html>

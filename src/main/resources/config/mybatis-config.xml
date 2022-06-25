@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--起别名-->
+    <typeAliases>
+        <package name="cn.jvtc.po"/>
+    </typeAliases>
+    <!--mybatis的插件配置-->
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 表示使用mysql的分页方法 -->
+            <property name="helperDialect" value="mysql"/>
+            <!-- 表示当页码长度为0 的时候,就不进行分页查询 -->
+            <property name="pageSizeZero" value="true"/>
+        </plugin>
+    </plugins>
+</configuration>

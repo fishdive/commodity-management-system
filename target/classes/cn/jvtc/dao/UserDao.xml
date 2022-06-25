@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jvtc.dao.UserDao">
+    <resultMap id="userResultMap" type="user">
+        <id property="id" column="id"/>
+        <result property="name" column="username"/>
+        <result property="password" column="password"/>
+        <result property="grade" column="grade"/>
+        <result property="state" column="state"/>
+        <result property="creator" column="creator"/>
+        <result property="modifier" column="modifier"/>
+    </resultMap>
+    <insert id="save" parameterType="user" useGeneratedKeys="true" keyProperty="id">
+        insert into ssm_crud_user(
+        username
+        <if test="user.password!=null and user.password!=''">
+            ,password
+        </if>
+        <if test="user.grade!=null and user.grade!=''">
+            ,grade
+        </if>
+        <if test="user.state!=null and user.state!=''">
+            ,state
+        </if>
+        <if test="user.creator!=null and user.creator!=''">
+            ,creator
+        </if>
+        )
+        VALUE (#{user.name}
+        <if test="user.password!=null and user.password!=''">
+            ,#{user.password}
+        </if>
+        <if test="user.grade!=null and user.grade!=''">
+            ,#{user.grade}
+        </if>
+        <if test="user.state!=null and user.state!=''">
+            ,#{user.state}
+        </if>
+        <if test="user.creator!=null and user.creator!=''">
+            ,#{user.creator}
+        </if>
+        )
+    </insert>
+    <update id="update" parameterType="user">
+        update ssm_crud_user
+        <set>
+            <if test="user.password!=null and user.password!=''">
+                password=#{user.password}
+            </if>
+            <if test="user.grade!=null and user.grade!=''">
+                ,grade= #{user.grade}
+            </if>
+            <if test="user.state!=null and user.state!=''">
+                ,state=#{user.state}
+            </if>
+            <if test="user.modifier!=null and user.modifier!=''">
+                ,modifier= #{user.modifier}
+            </if>
+        </set>
+        where username = #{user.name}
+    </update>
+    <delete id="delete" parameterType="String">
+        delete
+        from ssm_crud_user
+        where username = #{name}
+    </delete>
+    <select id="find" resultMap="userResultMap" parameterType="user">
+        select *
+        from ssm_crud_user
+        where username = #{user.name}
+          and password = #{user.password}
+    </select>
+    <select id="findAll" resultMap="userResultMap" parameterType="user">
+        select * from ssm_crud_user
+        <where>
+            <if test="user.id!=null">
+                id=#{user.id}
+            </if>
+            <if test="user.name!=null and user.name!=''">
+                and username like "%"#{user.name}"%"
+            </if>
+            <if test="user.grade!=null and user.grade!=''">
+                and grade=#{user.grade}
+            </if>
+            <if test="user.state!=null and user.state!=''">
+                and state=#{user.state}
+            </if>
+            <if test="user.creator!=null and user.creator!=''">
+                and creator like "%"#{user.creator}"%"
+            </if>
+            <if test="user.modifier!=null and user.modifier!=''">
+                and modifier like "%"#{user.modifier}"%"
+            </if>
+        </where>
+    </select>
+</mapper>

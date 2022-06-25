@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jvtc.dao.GoodsDao">
+    <resultMap id="goodsResultMap" type="goods">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="price" column="price"/>
+        <result property="image" column="image"/>
+        <result property="brand" column="brand"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+    <insert id="save" parameterType="goods" useGeneratedKeys="true" keyProperty="id">
+        insert into ssm_crud_goods(
+        <if test="goods.title!=null and goods.title!=''">
+            title
+        </if>
+        <if test="goods.price!=null and goods.price!=''">
+            ,price
+        </if>
+        <if test="goods.image!=null and goods.image!=''">
+            ,image
+        </if>
+        <if test="goods.brand!=null and goods.brand!=''">
+            ,brand
+        </if>
+        ,user_id
+        )
+        VALUE (
+        <if test="goods.title!=null and goods.title!=''">
+            #{goods.title}
+        </if>
+        <if test="goods.price!=null and goods.price!=''">
+            ,#{goods.price}
+        </if>
+        <if test="goods.image!=null and goods.image!=''">
+            ,#{goods.image}
+        </if>
+        <if test="goods.brand!=null and goods.brand!=''">
+            ,#{goods.brand}
+        </if>
+        ,#{goods.userId}
+        )
+    </insert>
+    <update id="update" parameterType="goods">
+        update ssm_crud_goods
+        <set>
+            <if test="goods.title!=null and goods.title!=''">
+                title=#{goods.title}
+            </if>
+            <if test="goods.price!=null and goods.price!=''">
+                ,price= #{goods.price}
+            </if>
+            <if test="goods.image!=null and goods.image!=''">
+                ,image=#{goods.image}
+            </if>
+            <if test="goods.brand!=null and goods.brand!=''">
+                ,brand= #{goods.brand}
+            </if>
+        </set>
+        where id = #{goods.id}
+    </update>
+    <delete id="delete" parameterType="integer">
+        delete
+        from ssm_crud_goods
+        where id = #{id}
+    </delete>
+    <select id="findAll" resultMap="goodsResultMap" parameterType="goods">
+        select * from ssm_crud_goods
+        <where>
+            <if test="goods.title!=null and goods.title!=''">
+                and title like "%"#{goods.title}"%"
+            </if>
+            <if test="goods.brand!=null and goods.brand!=''">
+                and brand=#{goods.brand}
+            </if>
+            <if test="goods.userId!=null">
+                and user_id =#{goods.userId}
+            </if>
+        </where>
+    </select>
+</mapper>
